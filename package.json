@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@vkontakte/vk-tunnel": "^0.2.2"
+  }
+}
