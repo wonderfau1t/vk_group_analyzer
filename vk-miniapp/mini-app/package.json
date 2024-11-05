@@ -1,5 +1,5 @@
 {
-  "name": "group-analysis-miniapp",
+  "name": "mini-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -25,7 +25,7 @@
     "@vitejs/plugin-legacy": "^5.3.1",
     "@vitejs/plugin-react": "^4.2.1",
     "@vkontakte/vk-miniapps-deploy": "^0.1.6",
-    "@vkontakte/vk-tunnel": "^0.2.2",
+    "@vkontakte/vk-tunnel": "^0.2.0",
     "eruda": "^3.0.1",
     "esbuild": "~0.20.0",
     "eslint": "^8.55.0",
