@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 
-from backend.vk_api_integration.methods import get_group_info
-from backend.vk_api_integration.models import GroupInfo
+from vk_api_integration.methods import get_group_info
+from vk_api_integration.models import GroupInfo
 from .utils import send_message, extract_group_id, generate_response
 
 

@@ -1,8 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from backend.vk_api_integration.methods import get_group_info
-from backend.vk_api_integration.models import GroupInfo
+from vk_api_integration import get_group_info
+from vk_api_integration import GroupInfo
 
 
 @api_view(['GET'])

@@ -1,7 +1,7 @@
 import re
 
-from backend.vk_api_integration.client import client
-from backend.vk_api_integration.models import GroupInfo
+from vk_api_integration.client import client
+from vk_api_integration.models import GroupInfo
 
 
 def extract_group_id(link):
