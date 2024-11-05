@@ -1,14 +1,29 @@
-import requests
+from django.conf import settings
+from requests import Session
 
 
-class VKClient:
-    def __init__(self, base_url: str, api_version: str, access_token: str):
-        self.api_version = api_version
-        self.access_token = access_token
-        self.base_url = base_url
+class VKApiClient:
+    def __init__(self):
+        self.session = Session()
+        self.api_version = "5.199"
+        self.base_url = "https://api.vk.com/method/"
+        self.tokens = {
+            'groups.getById': settings.GROUP_ACCESS_TOKEN,
+            'wall.get': settings.SERVICE_ACCESS_TOKEN,
+            'stats.get': 'test',
+            'groups.getOnlineStatus': settings.GROUP_ACCESS_TOKEN,
+            'messages.send': settings.GROUP_ACCESS_TOKEN
+        }
 
-    def get(self, endpoint: str, params: dict):
-        params.update({'access_token': self.access_token, 'v': self.api_version})
-        response = requests.get(f'{self.base_url}/{endpoint}', params)
-        # print(response.json())
-        return response.json()['response']
+    def get(self, endpoint, params=None, access_token=None):
+        params = params or {}
+        params['v'] = self.api_version
+        params['access_token'] = access_token or self.tokens[endpoint]
+        url = self.base_url + endpoint
+
+        response = self.session.get(url, params=params)
+        response.raise_for_status()
+        return response.json()
+
+
+client = VKApiClient()

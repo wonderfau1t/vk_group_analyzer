@@ -10,15 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
-from dotenv import load_dotenv
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 load_dotenv()
-API_KEY = os.getenv('API_KEY')
+USER_ACCESS_TOKEN = os.getenv('USER_ACCESS_TOKEN')
+GROUP_ACCESS_TOKEN = os.getenv('GROUP_ACCESS_TOKEN')
+VK_CONFIRMATION_TOKEN = os.getenv('VK_CONFIRMATION_TOKEN')
+SERVICE_ACCESS_TOKEN = os.getenv('SERVICE_ACCESS_TOKEN')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -29,8 +32,7 @@ SECRET_KEY = 'django-insecure-o+&#n2telh3hlctgbt3e(b=*22!@!%8t(o5wksrqoa58vyhcsw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'stunning-humpback-publicly.ngrok-free.app']
 
 # Application definition
 
@@ -75,7 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -105,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -116,7 +116,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
