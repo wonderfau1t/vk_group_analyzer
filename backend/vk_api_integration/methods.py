@@ -1,41 +1,52 @@
 import re
+from typing import Tuple
 
 from .client import client
 from .models import MainInfo, PostsInfo, GroupInfo
 
 
-def get_group_info(group_id: int, user_access_token=None) -> GroupInfo:
-    main_info = get_main_info(group_id)
-    posts_info = get_posts_info(group_id)
-    if user_access_token:
-        main_info.can_message = can_message_to_group(group_id, user_access_token)
+def get_group_info(group_id: int | str, user_access_token=None) -> GroupInfo | None:
+    main_info, group_id = get_main_info(group_id)
+    if main_info:
+        posts_info = get_posts_info(group_id)
+        if user_access_token:
+            main_info.can_message = can_message_to_group(group_id, user_access_token)
 
-    return GroupInfo(
-        main_info=main_info,
-        posts_info=posts_info,
-    )
+        return GroupInfo(
+            main_info=main_info,
+            posts_info=posts_info,
+        )
+    return None
 
 
-def get_main_info(group_id: int) -> MainInfo:
+def get_main_info(group_id: int) -> Tuple[MainInfo, int] | Tuple[None, None]:
     params = {
         'group_id': group_id,
         'fields': 'contacts,cover,description,fixed_post,market'
     }
     response = client.get('groups.getById', params)
-    data = response['response']['groups'][0]
-    online_response = client.get('groups.getOnlineStatus', params={'group_id': group_id})
-    status = online_response.get('response', {}).get('status') == 'online'
+    data = response['response']['groups'][0] if response.get('response') else {}
 
-    return MainInfo(
-        contacts=bool(data.get('contacts')),
-        cover=bool(data['cover']['enabled']),
-        screen_name=bool(data.get('screen_name')),
-        description=bool(data.get('description')),
-        fixed_post=bool(data.get('fixed_post')),
-        market=bool(data['market']['enabled']),
-        status=status,
-        can_message=None
-    )
+    if bool(data.get('name')):
+        online_response = client.get('groups.getOnlineStatus', params={'group_id': group_id})
+        status = online_response.get('response', {}).get('status') == 'online'
+
+        return MainInfo(
+            name=data.get('name'),
+            photo_100=data.get('photo_100'),
+            photo_200=data.get('photo_200'),
+            activity=data.get('activity'),
+            members_count=data.get('members_count'),
+            contacts=bool(data.get('contacts')),
+            cover=bool(data['cover']['enabled']),
+            screen_name=bool(data.get('screen_name')),
+            description=bool(data.get('description')),
+            fixed_post=bool(data.get('fixed_post')),
+            market=bool(data['market']['enabled']),
+            status=status,
+            can_message=None
+        ), data.get('id')
+    return None, None
 
 
 def get_posts_info(group_id: int) -> PostsInfo:
