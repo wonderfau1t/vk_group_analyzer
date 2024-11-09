@@ -13,6 +13,7 @@ export const DEFAULT_VIEW = 'default_view';
 export const DEFAULT_VIEW_PANELS = {
   HOME: 'home',
   PERSIK: 'persik',
+  GROUP: 'group',
 };
 
 export const routes = RoutesConfig.create([
@@ -20,6 +21,7 @@ export const routes = RoutesConfig.create([
     createView(DEFAULT_VIEW, [
       createPanel(DEFAULT_VIEW_PANELS.HOME, '/', []),
       createPanel(DEFAULT_VIEW_PANELS.PERSIK, `/${DEFAULT_VIEW_PANELS.PERSIK}`, []),
+      createPanel(DEFAULT_VIEW_PANELS.GROUP, `/${DEFAULT_VIEW_PANELS.GROUP}`, [])
     ]),
   ]),
 ]);

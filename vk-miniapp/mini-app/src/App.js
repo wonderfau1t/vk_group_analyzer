@@ -1,24 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import { View, SplitLayout, SplitCol, ScreenSpinner } from '@vkontakte/vkui';
-import { useActiveVkuiLocation } from '@vkontakte/vk-mini-apps-router';
+import { View, ScreenSpinner } from '@vkontakte/vkui';
 
-import { Persik, Home } from './panels';
-import { DEFAULT_VIEW_PANELS } from './routes';
+import { Persik, Home, AnalysedGroup } from './panels';
 
 export const App = () => {
-  const { panel: activePanel = DEFAULT_VIEW_PANELS.HOME } = useActiveVkuiLocation();
+  const [activePanel, setActivePanel] = useState('home');
   const [fetchedUser, setUser] = useState();
   const [fetchedToken, setToken] = useState();
   const [popout, setPopout] = useState(<ScreenSpinner size="large" />);
+  const [selectedGroupId, setSelectedGroupId] = useState(null)
+
+  const goToGroup = useCallback((groupId) => {
+    setSelectedGroupId(groupId)
+    setActivePanel('group');
+  }, []);
+
+  const goBack = useCallback(() => {
+    setActivePanel('home');
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
       const user = await bridge.send('VKWebAppGetUserInfo');
       const token = await bridge.send('VKWebAppGetAuthToken', {
         app_id: 52612592,
-        scope: 'groups',
+        scope: 'groups,video',
       });
+
       setUser(user);
       setToken(token);
       setPopout(null);
@@ -26,23 +35,11 @@ export const App = () => {
     fetchData();
   }, []);
 
-  // bridge.send('VKWebAppGetAuthToken', {
-  //   app_id: 52612592,
-  //   scope: 'groups,messages',
-  // })
-  // .then( (data) => {
-  //   if (data.access_token) {
-  //     console.log(data.access_token)
-  //   }
-  // })
   return (
-    <SplitLayout popout={popout}>
-      <SplitCol>
-        <View activePanel={activePanel}>
-          <Home id="home" fetchedUser={fetchedUser} fetchedToken={fetchedToken} />
-          <Persik id="persik" />
-        </View>
-      </SplitCol>
-    </SplitLayout>
+    <View activePanel={activePanel} popout={popout}>
+      <Home id="home" fetchedUser={fetchedUser} fetchedToken={fetchedToken} onGroupClick={goToGroup} />
+      <Persik id="persik" />
+      <AnalysedGroup id="group" onBackClick={goBack} groupId={selectedGroupId} />
+    </View>
   );
 };
