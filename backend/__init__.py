@@ -1,1 +1,1 @@
-# from vk_api_integration import *
+from vk_api_integration import *

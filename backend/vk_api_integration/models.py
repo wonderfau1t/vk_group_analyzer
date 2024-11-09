@@ -3,6 +3,11 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class MainInfo:
+    name: str
+    photo_100: str
+    photo_200: str
+    activity: str
+    members_count: int
     contacts: bool
     cover: bool
     screen_name: bool
