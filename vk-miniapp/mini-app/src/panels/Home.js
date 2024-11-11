@@ -1,9 +1,9 @@
-import { Panel, PanelHeader, Group, Cell, Div, Avatar, Search, Separator, SegmentedControl, Title, Spacing, CustomScrollView, List, Placeholder } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Cell, Div, Avatar, Search, Separator, SegmentedControl, Title, Spacing, CustomScrollView, List, Placeholder, Tappable, Button } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge';
 import { useState, useEffect } from 'react';
 import {Icon56InfoOutline} from '@vkontakte/icons';
 
-export const Home = ({ id, fetchedUser, fetchedToken }) => {
+export const Home = ({ id, fetchedToken, onGroupClick }) => {
   const [subscribedGroups, setSubscribedGroups] = useState([]);
   const [administeredGroups, setAdministeredGroups] = useState([]);
   const [selectedTab, setSelectedTab] = useState('subscribes');
@@ -36,6 +36,9 @@ export const Home = ({ id, fetchedUser, fetchedToken }) => {
   }
 
   useEffect(() => {
+    if (!fetchedToken || !fetchedToken.access_token) {
+      return;
+    }
     const fetchAndSplitGroups = async () => {
       const response = await bridge.send("VKWebAppCallAPIMethod", {
         method: 'groups.get',
@@ -65,10 +68,10 @@ export const Home = ({ id, fetchedUser, fetchedToken }) => {
     : selectedTab === 'administered'
     ? administeredGroups.filter((group) => group.name.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase()))
     : searchedGroups;
+
   return (
     <Panel id={id}>
       <PanelHeader>Анализ групп</PanelHeader>
-      {fetchedUser && (
         <Group header={<Title level='1' style={{marginBottom: 10, paddingTop: 20, paddingLeft: 20}}>Выберите группу для анализа</Title>}>
           <Spacing size={16}>
             <Separator/>
@@ -95,22 +98,19 @@ export const Home = ({ id, fetchedUser, fetchedToken }) => {
                 onChange={handleTabChange}
               />
             </Div>
-          </Div>
-          <Div>
             <Group>
               {groupsToDisplay.length > 0 ? (
                 <CustomScrollView windowResize={true} style={{height: 350}}>
-                    <List>
-                      {groupsToDisplay.map((group) => (
-                        <Cell
-                          key={group.id}
-                          before={group.photo_100 ? <Avatar src={group.photo_100} /> : null}
-                          subtitle={group.activity}
-                        >
-                          {group.name}
-                        </Cell>
-                      ))}
-                    </List>
+                  {groupsToDisplay.map((group) => (
+                    <Cell
+                      key={group.id}
+                      before={group.photo_100 ? <Avatar src={group.photo_100} /> : null}
+                      subtitle={group.activity}
+                      onClick={() => onGroupClick(group.id)}
+                    >
+                      {group.name}
+                    </Cell>
+                  ))}
                 </CustomScrollView>
               ) : (
                 <Placeholder icon={<Icon56InfoOutline/>} header='Нет групп, соответствующих вашему запросу'>
@@ -120,7 +120,6 @@ export const Home = ({ id, fetchedUser, fetchedToken }) => {
             </Group>
           </Div>
         </Group>
-      )}
     </Panel>
   );
 };
