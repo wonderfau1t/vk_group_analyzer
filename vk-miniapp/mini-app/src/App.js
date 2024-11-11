@@ -39,7 +39,7 @@ export const App = () => {
     <View activePanel={activePanel} popout={popout}>
       <Home id="home" fetchedUser={fetchedUser} fetchedToken={fetchedToken} onGroupClick={goToGroup} />
       <Persik id="persik" />
-      <AnalysedGroup id="group" onBackClick={goBack} groupId={selectedGroupId} />
+      <AnalysedGroup id="group" onBackClick={goBack} groupId={selectedGroupId} fetchedToken={fetchedToken} />
     </View>
   );
 };

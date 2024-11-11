@@ -15,8 +15,9 @@ import { useState, useEffect } from "react";
 import PersikImage from "..//assets/persik.png";
 import bridge from "@vkontakte/vk-bridge";
 
-export const AnalysedGroup = ({id, onBackClick, groupId}) => {
+export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
   const [selectedTab, setSelectedTab] = useState();
+  const [groupInfo, setGroupInfo] = useState({});
 
   const handleTabChange = (value) => {
     setSelectedTab(value);
@@ -24,15 +25,31 @@ export const AnalysedGroup = ({id, onBackClick, groupId}) => {
 
   useEffect(() => {
     async function GetInfoAboutGroup() {
-      const info = await bridge.send('VKWebAppCallAPIMethod', {
-        method: 'groups.getById',
-        params: {
+      try {
+        const params = new URLSearchParams({
           group_id: groupId,
-          
+          access_token: fetchedToken.access_token,
+        });
+  
+        const response = await fetch(`http://localhost:8000/api/check_group?${params.toString()}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+          }
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Ошибка запроса: ${response.status} ${response.statusText}`);
         }
-      });
+  
+        const data = await response.json();
+        setGroupInfo(data.main_info);
+      } catch (error) {
+        console.error("Ошибка при получении информации о группе:", error);
+      }
     };
-  });
+    GetInfoAboutGroup();
+  }, [groupId, fetchedToken] );
 
   return (
     <Panel id={id}>
@@ -43,9 +60,9 @@ export const AnalysedGroup = ({id, onBackClick, groupId}) => {
         <SimpleCell
           after={<Image src={PersikImage} alt="Аватар группы"/>}
         >
-          <Title level="1">Название группы</Title>
-          <Subhead>{groupId}</Subhead>
-          <Subhead>Количество подписчиков</Subhead>
+          <Title level="1">{groupInfo.name}</Title>
+          <Subhead></Subhead>
+          <Subhead></Subhead>
         </SimpleCell>
         
       </Group>
