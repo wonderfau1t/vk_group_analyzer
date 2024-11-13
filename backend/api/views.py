@@ -9,7 +9,7 @@ from .models import APIResponse, Parameter
 from vk_api_integration import GroupInfo
 from vk_api_integration import get_group_info
 
-messages = json.load(open('/Users/wonderfau1t/workspace/python/vk_group_analyzer/backend/api/messages.json', 'r', encoding='utf-8'))
+messages = json.load(open('api/messages.json', 'r', encoding='utf-8'))
 
 
 @api_view(['GET'])
