@@ -4,6 +4,7 @@ from typing import List, Dict
 
 @dataclass
 class Parameter:
+    id: str
     title: str
     description: str
 
@@ -16,9 +17,9 @@ class APIResponse:
     activity: str
     members_count: int
     score: int
-    good: Dict[str, Parameter]
-    normal: Dict[str, Parameter]
-    bad: Dict[str, Parameter]
+    good: List[Parameter]
+    normal: List[Parameter]
+    bad: List[Parameter]
 
     def to_dict(self):
         return asdict(self)
