@@ -33,18 +33,18 @@ def generate_response(group_info: GroupInfo) -> APIResponse:
             if avegarage_time_between_posts_in_hours < 6:
                 normal['average_time_between_posts'] = Parameter(
                     title=messages['average_time_between_posts']['title'],
-                    description=messages['average_time_between_posts']['low'].format(value['days'], value['hours'], value['minutes'])
+                    description=messages['average_time_between_posts']['low'].format(int(value['days']), int(value['hours']), int(value['minutes']))
                 )
             elif 6 < avegarage_time_between_posts_in_hours < 30:
                 good['average_time_between_posts'] = Parameter(
                     title=messages['average_time_between_posts']['title'],
-                    description=messages['average_time_between_posts']['medium'].format(value['days'], value['hours'], value['minutes'])
+                    description=messages['average_time_between_posts']['medium'].format(int(value['days']), int(value['hours']), int(value['minutes']))
                 )
                 score += 7.69
             else:
                 normal['average_time_between_posts'] = Parameter(
                     title=messages['average_time_between_posts']['title'],
-                    description=messages['average_time_between_posts']['high'].format(value['days'], value['hours'], value['minutes'])
+                    description=messages['average_time_between_posts']['high'].format(int(value['days']), int(value['hours']), int(value['minutes']))
                 )
         elif field == 'er':
             good[field] = Parameter(
