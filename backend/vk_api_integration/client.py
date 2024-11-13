@@ -8,7 +8,7 @@ class VKApiClient:
         self.api_version = "5.199"
         self.base_url = "https://api.vk.com/method/"
         self.tokens = {
-            'groups.getById': settings.GROUP_ACCESS_TOKEN,
+            'groups.getById': settings.USER_ACCESS_TOKEN,
             'wall.get': settings.SERVICE_ACCESS_TOKEN,
             'stats.get': 'test',
             'groups.getOnlineStatus': settings.GROUP_ACCESS_TOKEN,
