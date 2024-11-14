@@ -30,9 +30,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o+&#n2telh3hlctgbt3e(b=*22!@!%8t(o5wksrqoa58vyhcsw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'stunning-humpback-publicly.ngrok-free.app']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
