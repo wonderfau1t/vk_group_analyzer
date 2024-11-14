@@ -3,10 +3,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
-
 from vk_api_integration import get_group_info
+from api.views import generate_response
+
 from .keyboards import main_menu_keyboard, group_analysis_keyboard
-from .utils import send_message, extract_group_id, generate_response
+from .utils import send_message, extract_group_id, generate_message_text
 
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
 redis_client.flushdb()
@@ -59,9 +60,15 @@ def message_handler(user_id: int, message_text: str):
             if group_id:
                 group_info = get_group_info(group_id)
                 if group_info:
-                    response_message = generate_response(group_info)
+
+                    group_info = generate_response(group_info)
+                    response_messages = generate_message_text(group_info).split('||')
+                    for i in range(len(response_messages)):
+                        if i == len(response_messages) - 1:
+                            send_message(user_id, response_messages[i], main_menu_keyboard)
+                        else:
+                            send_message(user_id, response_messages[i])
                     set_user_state(user_id, 'idle')
-                    send_message(user_id, response_message, main_menu_keyboard)
                 else:
                     response_message = 'Группа не найдена'
                     send_message(user_id, response_message)

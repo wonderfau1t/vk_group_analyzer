@@ -25,5 +25,15 @@ class VKApiClient:
         response.raise_for_status()
         return response.json()
 
+    def post(self, endpoint, body=None, access_token=None):
+        body = body or {}
+        body['v'] = self.api_version
+        body['access_token'] = access_token or self.tokens[endpoint]
+        url = self.base_url + endpoint
+
+        response = self.session.post(url, data=body)
+        response.raise_for_status()
+        return response.json()
+
 
 client = VKApiClient()
