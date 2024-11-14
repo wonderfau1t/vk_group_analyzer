@@ -20,7 +20,6 @@ def send_message(user_id: int, message: str, keyboard: str | None = None):
     if keyboard:
         params['keyboard'] = keyboard
     response = client.post('messages.send', params)
-    print(response)
 
 
 def generate_message_text(data: APIResponse) -> str:
