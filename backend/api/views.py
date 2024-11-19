@@ -38,6 +38,7 @@ def generate_response(group_info: GroupInfo) -> APIResponse:
                                                                                      int(value['hours']),
                                                                                      int(value['minutes']))
                 ))
+                score += 3.85
             elif 6 < avegarage_time_between_posts_in_hours < 30:
                 good.append(Parameter(
                     id=field,
@@ -55,13 +56,29 @@ def generate_response(group_info: GroupInfo) -> APIResponse:
                                                                                       int(value['hours']),
                                                                                       int(value['minutes']))
                 ))
+                score += 0
         elif field == 'er':
-            good.append(Parameter(
-                id=field,
-                title=messages[field]['title'],
-                description=messages[field]['info'].format(value)
-            ))
-            score += 7.69
+            if value > 3:
+                good.append(Parameter(
+                    id=field,
+                    title=messages[field]['title'],
+                    description=messages[field]['info'].format(value)
+                ))
+                score += 7.69
+            elif 1 < value < 3:
+                normal.append(Parameter(
+                    id=field,
+                    title=messages[field]['title'],
+                    description=messages[field]['info'].format(value)
+                ))
+                score += 3.85
+            else:
+                bad.append(Parameter(
+                    id=field,
+                    title=messages[field]['title'],
+                    description=messages[field]['info'].format(value)
+                ))
+                score += 0
         elif value:
             good.append(Parameter(
                 id=field,
