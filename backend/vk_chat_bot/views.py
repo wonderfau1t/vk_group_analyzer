@@ -62,12 +62,10 @@ def message_handler(user_id: int, message_text: str):
                 if group_info:
 
                     group_info = generate_response(group_info)
-                    response_messages = generate_message_text(group_info).split('||')
-                    for i in range(len(response_messages)):
-                        if i == len(response_messages) - 1:
-                            send_message(user_id, response_messages[i], main_menu_keyboard)
-                        else:
-                            send_message(user_id, response_messages[i])
+                    response_messages = generate_message_text(group_info)
+                    pivot = len(response_messages) // 2
+                    send_message(user_id, ''.join(response_messages[:pivot]))
+                    send_message(user_id, ''.join(response_messages[pivot:]))
                     set_user_state(user_id, 'idle')
                 else:
                     response_message = 'Группа не найдена'
