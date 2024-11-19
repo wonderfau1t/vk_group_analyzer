@@ -3,9 +3,9 @@ from django.conf import settings
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
-from vk_api_integration import get_group_info
-from api.views import generate_response
 
+from api.views import generate_response
+from vk_api_integration import get_group_info
 from .keyboards import main_menu_keyboard, group_analysis_keyboard
 from .utils import send_message, extract_group_id, generate_message_text
 
@@ -48,7 +48,7 @@ def message_handler(user_id: int, message_text: str):
             set_user_state(user_id, 'awaiting_link')
         else:
             response_message = 'Команда не распознана :( \nСписок возможных команд:\nАнализ\nДоп. функционал 1\n Доп. функционал 2'
-            keyboard = None
+            keyboard = main_menu_keyboard
         send_message(user_id, response_message, keyboard)
     elif state == 'awaiting_link':
         if message_text == 'Главное меню':
@@ -65,7 +65,7 @@ def message_handler(user_id: int, message_text: str):
                     response_messages = generate_message_text(group_info)
                     pivot = len(response_messages) // 2
                     send_message(user_id, ''.join(response_messages[:pivot]))
-                    send_message(user_id, ''.join(response_messages[pivot:]))
+                    send_message(user_id, ''.join(response_messages[pivot:]), main_menu_keyboard)
                     set_user_state(user_id, 'idle')
                 else:
                     response_message = 'Группа не найдена'
