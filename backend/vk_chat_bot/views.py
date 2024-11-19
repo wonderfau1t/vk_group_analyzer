@@ -40,14 +40,15 @@ def message_handler(user_id: int, message_text: str):
     state = get_user_state(user_id)
     if state == 'idle':
         if message_text == 'Начать':
-            response_message = 'Приветствие'
+            response_message = ('Здравствуйте! Я помогу вам проверить оформление вашего сообщества ВКонтакте. '
+                                'Давайте начнем!')
             keyboard = main_menu_keyboard
         elif message_text in ('Анализ сообщества', 'Анализ'):
-            response_message = 'Скиньте ссылку на сообщество'
+            response_message = 'Для анализа пришлите, пожалуйста, ссылку на сообщество, которое хотите проверить.'
             keyboard = group_analysis_keyboard
             set_user_state(user_id, 'awaiting_link')
         else:
-            response_message = 'Команда не распознана :( \nСписок возможных команд:\nАнализ\nДоп. функционал 1\n Доп. функционал 2'
+            response_message = 'Команда не распознана. Список возможных команд:\nГлавное меню\nАнализ'
             keyboard = main_menu_keyboard
         send_message(user_id, response_message, keyboard)
     elif state == 'awaiting_link':
@@ -68,8 +69,8 @@ def message_handler(user_id: int, message_text: str):
                     send_message(user_id, ''.join(response_messages[pivot:]), main_menu_keyboard)
                     set_user_state(user_id, 'idle')
                 else:
-                    response_message = 'Группа не найдена'
+                    response_message = 'Сообщество не найдено. Убедитесь, что ссылка верна и ведет на существующую группу ВКонтакте.'
                     send_message(user_id, response_message)
             else:
-                response_message = 'Ссылка на группа должна быть в формате:\nhttps://vk.com/...'
+                response_message = 'Не удалось найти сообщество. Пожалуйста, убедитесь, что ссылка соответствует формату: https://vk.com/… и повторите попытку'
                 send_message(user_id, response_message)

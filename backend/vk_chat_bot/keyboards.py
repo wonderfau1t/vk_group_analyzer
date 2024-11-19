@@ -10,24 +10,6 @@ main_menu_keyboard = dumps({
                 },
                 'color': 'primary'
             }
-        ],
-        [
-            {
-                'action': {
-                    'type': 'text',
-                    'label': 'Доп. функционал 1'
-                },
-                'color': 'secondary'
-            }
-        ],
-        [
-            {
-                'action': {
-                    'type': 'text',
-                    'label': 'Доп. функционал 2'
-                },
-                'color': 'secondary'
-            }
         ]
     ]
 })

@@ -1,4 +1,5 @@
 import re
+from math import ceil
 
 from api.models import APIResponse
 from vk_api_integration.client import client
@@ -19,15 +20,15 @@ def send_message(user_id: int, message: str, keyboard: str | None = None):
     }
     if keyboard:
         params['keyboard'] = keyboard
-    response = client.post('messages.send', params)
+    client.post('messages.send', params)
 
 
 def generate_message_text(data: APIResponse) -> str:
     messages = []
 
-    messages.append(
-        "Аудит сообщества закончен. Сообщество было проверено по самым важным параметрам, которые могут влиять на " \
-        "привлечение клиентов и подписчиков.\nРезультаты:\n")
+    messages.append("Аудит сообщества завершен. Сообщество набрало {}% по итогам проверки всех ключевых параметров, "
+                    "которые влияют на привлечение клиентов и подписчиков. "
+                    "Ниже представлены результаты анализа по основным критериям:".format(ceil(data.score)))
     for parameter in data.good:
         messages.append(f"\n🟢 {parameter.title}\n{parameter.description}\n")
     for parameter in data.normal:
