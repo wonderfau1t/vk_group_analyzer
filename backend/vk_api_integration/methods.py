@@ -31,6 +31,7 @@ def get_main_info(group_id: int, user_access_token=None) -> Tuple[GroupInfo, int
     }
     if user_access_token:
         response = client.get('groups.getById', params, access_token=user_access_token)
+        print(response)
     else:
         response = client.get('groups.getById', params)
     data = response['response']['groups'][0] if response.get('response') else {}
