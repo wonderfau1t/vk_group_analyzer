@@ -15,8 +15,7 @@ messages = json.load(open('api/messages.json', 'r', encoding='utf-8'))
 @api_view(['GET'])
 def check_group(request):
     group_id = request.query_params.get('group_id')
-    access_token = request.query_params.get('access_token')
-    group_info: GroupInfo = get_group_info(group_id, access_token)
+    group_info: GroupInfo = get_group_info(group_id)
     response: APIResponse = generate_response(group_info)
     return Response(response.to_dict())
 

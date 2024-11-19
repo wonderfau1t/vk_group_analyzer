@@ -24,16 +24,12 @@ def get_group_info(group_id: int | str, user_access_token=None) -> GroupInfo | N
     return None
 
 
-def get_main_info(group_id: int, user_access_token=None) -> Tuple[GroupInfo, int] | Tuple[None, None]:
+def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None]:
     params = {
         'group_id': group_id,
         'fields': 'contacts,counters,cover,description,fixed_post,market,activity,members_count'
     }
-    if user_access_token:
-        response = client.get('groups.getById', params, access_token=user_access_token)
-        print(response)
-    else:
-        response = client.get('groups.getById', params)
+    response = client.get('groups.getById', params)
     data = response['response']['groups'][0] if response.get('response') else {}
 
     if bool(data.get('name')):
