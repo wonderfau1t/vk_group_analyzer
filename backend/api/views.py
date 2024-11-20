@@ -28,6 +28,12 @@ def generate_response(group_info: GroupInfo) -> APIResponse:
 
     for field, value in group_info.result_of_check.__dict__.items():
         if field == 'average_time_between_posts':
+            if value.get('error_message'):
+                bad.append(Parameter(
+                    id=field,
+                    title=messages['average_time_between_posts']['title'],
+                    description=value['error_message']
+                ))
             avegarage_time_between_posts_in_hours = value['days'] * 24 + value['hours'] + value['minutes'] / 60
             if avegarage_time_between_posts_in_hours < 6:
                 normal.append(Parameter(
