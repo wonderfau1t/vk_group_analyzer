@@ -23,7 +23,11 @@ def vk_callback(request: Request) -> HttpResponse:
     elif data.get('type') == 'message_new':
         user_id = data['object']['message']['from_id']
         message_text = data['object']['message']['text']
-        message_handler(user_id, message_text)
+        attachments = data['object']['message']['attachments']
+        if attachments:
+            message_handler(user_id, attachments[0]['link']['url'])
+        else:
+            message_handler(user_id, message_text)
         return HttpResponse('ok', content_type='text/plain')
 
 
@@ -65,7 +69,8 @@ def message_handler(user_id: int, message_text: str):
                     response_messages = generate_message_text(group_info)
                     pivot = len(response_messages) // 2
                     send_message(user_id, ''.join(response_messages[:pivot]))
-                    send_message(user_id, ''.join(response_messages[pivot:]), main_menu_keyboard)
+                    send_message(user_id, ''.join(response_messages[pivot:]))
+                    send_message(user_id, '🔎 Если хотите проанализировать другое сообщество, то нажмите на "Аудит сообщества"', main_menu_keyboard)
                     set_user_state(user_id, 'idle')
                 else:
                     response_message = 'Сообщество не найдено. Убедитесь, что ссылка верна и ведет на существующую группу ВКонтакте.'
