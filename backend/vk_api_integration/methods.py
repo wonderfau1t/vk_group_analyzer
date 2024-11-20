@@ -97,6 +97,12 @@ def can_message_to_group(group_id: int, user_access_token: str) -> bool:
 
 
 def get_average_time_between_posts(posts) -> dict:
+    if len(posts) == 1:
+        return {
+            'days': 30,
+            'hours': 0,
+            'minutes': 0
+        }
     timestamps = sorted([post['date'] for post in posts], reverse=True)
     intervals = [timestamps[i] - timestamps[i + 1] for i in range(len(timestamps) - 1)]
     average_interval = sum(intervals) / len(intervals)
