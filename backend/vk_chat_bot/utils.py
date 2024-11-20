@@ -1,8 +1,13 @@
 import re
 from math import ceil
 
+import redis
+
 from api.models import APIResponse
 from vk_api_integration.client import client
+
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
+redis_client.flushdb()
 
 
 def extract_group_id(link):
@@ -23,7 +28,16 @@ def send_message(user_id: int, message: str, keyboard: str | None = None):
     client.post('messages.send', params)
 
 
-def generate_message_text(data: APIResponse) -> str:
+def set_user_state(user_id, state):
+    redis_client.set(f'user_state:{user_id}', state)
+
+
+def get_user_state(user_id):
+    state = redis_client.get(f'user_state:{user_id}')
+    return state.decode('utf-8') if state else 'idle'
+
+
+def generate_message_text(data: APIResponse) -> list:
     messages = []
 
     messages.append("{} Общий результат: {}%\n\nАудит сообщества завершен. Сообщество было проверено по ключевым "
