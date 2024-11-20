@@ -98,13 +98,13 @@ def generate_response(group_info: GroupInfo) -> APIResponse:
                 bad.append(Parameter(
                     id=field,
                     title=messages[field]['title'],
-                    description=re.sub(url_pattern, r'<Link href="\1">\1</Link>', messages[field]['negative'])
+                    description=re.sub(url_pattern, r'<a href="\1">\1</a>', messages[field]['negative'])
                 ))
             else:
                 normal.append(Parameter(
                     id=field,
                     title=messages[field]['title'],
-                    description=re.sub(url_pattern, r'<Link href="\1">\1</Link>', messages[field]['negative'])
+                    description=re.sub(url_pattern, r'<a href="\1">\1</a>', messages[field]['negative'])
                 ))
 
     return APIResponse(
