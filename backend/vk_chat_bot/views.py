@@ -40,15 +40,15 @@ def message_handler(user_id: int, message_text: str):
     state = get_user_state(user_id)
     if state == 'idle':
         if message_text == 'Начать':
-            response_message = ('Здравствуйте! Я помогу вам проверить оформление вашего сообщества ВКонтакте. '
+            response_message = ('Здравствуйте! Я помогу вам проверить оформление сообщества ВКонтакте по нескольким параметрам '
                                 'Давайте начнем!')
             keyboard = main_menu_keyboard
-        elif message_text in ('Анализ сообщества', 'Анализ'):
-            response_message = 'Для анализа пришлите, пожалуйста, ссылку на сообщество, которое хотите проверить.'
+        elif message_text in ('Аудит сообщества', 'Аудит'):
+            response_message = 'Для аудита пришлите, пожалуйста, ссылку на сообщество, которое хотите проверить.'
             keyboard = group_analysis_keyboard
             set_user_state(user_id, 'awaiting_link')
         else:
-            response_message = 'Команда не распознана. Список возможных команд:\nГлавное меню\nАнализ'
+            response_message = 'Команда не распознана. Список возможных команд:\nГлавное меню\nАудит'
             keyboard = main_menu_keyboard
         send_message(user_id, response_message, keyboard)
     elif state == 'awaiting_link':

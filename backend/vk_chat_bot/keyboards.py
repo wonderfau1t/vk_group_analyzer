@@ -6,7 +6,7 @@ main_menu_keyboard = dumps({
             {
                 'action': {
                     'type': 'text',
-                    'label': 'Анализ сообщества',
+                    'label': 'Аудит сообщества',
                 },
                 'color': 'primary'
             }
