@@ -103,6 +103,7 @@ def get_average_time_between_posts(posts) -> dict:
             'hours': 0,
             'minutes': 0
         }
+    print(len(posts))
     timestamps = sorted([post['date'] for post in posts], reverse=True)
     intervals = [timestamps[i] - timestamps[i + 1] for i in range(len(timestamps) - 1)]
     average_interval = sum(intervals) / len(intervals)
