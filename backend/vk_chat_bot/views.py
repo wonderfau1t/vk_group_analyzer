@@ -72,7 +72,7 @@ def message_handler(user_id: int, message_text: str):
                     group_info = generate_response(group_info)
                     response_messages = generate_message_text(group_info)
                     pivot = len(response_messages) // 2
-                    time.sleep(random.randint(5, 8))
+                    time.sleep(random.randint(1, 3))
                     send_message(user_id, ''.join(response_messages[:pivot]))
                     send_message(user_id, ''.join(response_messages[pivot:]))
                     send_message(user_id, '🔎 Если хотите проанализировать другое сообщество, то нажмите на "Аудит сообщества"', main_menu_keyboard)
