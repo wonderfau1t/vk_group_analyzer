@@ -18,7 +18,7 @@ def get_group_info(group_id: int | str) -> GroupInfo | None:
     return None
 
 
-def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None]:
+def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None] | dict:
     params = {
         'group_id': group_id,
         'fields': 'contacts,counters,cover,description,fixed_post,market,activity,members_count,can_message'
@@ -27,6 +27,8 @@ def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None]:
     data = response['response']['groups'][0] if response.get('response') else {}
 
     if bool(data.get('name')):
+        if data.get('is_closed'):
+            return None, None
         online_response = client.get('groups.getOnlineStatus', params={'group_id': data.get('id')})
         status = online_response.get('response', {}).get('status') == 'online'
 
@@ -67,7 +69,8 @@ def get_posts_info(group_id: int, members_count: int):
     reposts_exists = bool(sum(1 for post in recent_posts if 'copy_history' in post))
     hashtags_exists = bool(sum(1 for post in recent_posts if re.search(r'#\w+', post.get('text', ''))))
     average_time_between_posts = get_average_time_between_posts(recent_posts)
-    er = round(sum(post['comments']['count'] + post['likes']['count'] + post['reposts']['count'] for post in recent_posts) / members_count * 100, 2)
+    er = round(sum(post['comments']['count'] + post['likes']['count'] + post['reposts']['count'] for post in
+                   recent_posts) / members_count * 100, 2)
 
     return {
         'reposts': reposts_exists,

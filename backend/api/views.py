@@ -16,6 +16,8 @@ messages = json.load(open('api/messages.json', 'r', encoding='utf-8'))
 def check_group(request):
     group_id = request.query_params.get('group_id')
     group_info: GroupInfo = get_group_info(group_id)
+    if group_info is None:
+        return Response({'error_message': 'Группа закрыта'})
     response: APIResponse = generate_response(group_info)
     return Response(response.to_dict())
 
