@@ -1,5 +1,4 @@
 import json
-import re
 from math import ceil
 from typing import List
 
@@ -11,7 +10,7 @@ from vk_api_integration import get_group_info
 from .models import APIResponse, Parameter
 
 messages = json.load(open('api/messages.json', 'r', encoding='utf-8'))
-url_pattern = r'(https?://[^\s]+)'
+
 
 @api_view(['GET'])
 def check_group(request):
@@ -98,13 +97,13 @@ def generate_response(group_info: GroupInfo) -> APIResponse:
                 bad.append(Parameter(
                     id=field,
                     title=messages[field]['title'],
-                    description=re.sub(url_pattern, r'<a href="\1">\1</a>', messages[field]['negative'])
+                    description=messages[field]['negative']
                 ))
             else:
                 normal.append(Parameter(
                     id=field,
                     title=messages[field]['title'],
-                    description=re.sub(url_pattern, r'<a href="\1">\1</a>', messages[field]['negative'])
+                    description=messages[field]['negative']
                 ))
 
     return APIResponse(

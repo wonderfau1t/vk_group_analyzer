@@ -27,7 +27,7 @@ def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None]:
     data = response['response']['groups'][0] if response.get('response') else {}
 
     if bool(data.get('name')):
-        online_response = client.get('groups.getOnlineStatus', params={'group_id': group_id})
+        online_response = client.get('groups.getOnlineStatus', params={'group_id': data.get('id')})
         status = online_response.get('response', {}).get('status') == 'online'
 
         return GroupInfo(

@@ -61,7 +61,6 @@ def message_handler(user_id: int, message_text: str):
             if group_id:
                 group_info = get_group_info(group_id)
                 if group_info:
-
                     group_info = generate_response(group_info)
                     response_messages = generate_message_text(group_info)
                     pivot = len(response_messages) // 2
