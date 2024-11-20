@@ -6,20 +6,14 @@ from .client import client
 from .models import GroupInfo, ResultOfCheck
 
 
-def get_group_info(group_id: int | str, user_access_token=None) -> GroupInfo | None:
-    if user_access_token:
-        group_info, group_id = get_main_info(group_id, user_access_token)
-    else:
-        group_info, group_id = get_main_info(group_id)
+def get_group_info(group_id: int | str) -> GroupInfo | None:
+    group_info, group_id = get_main_info(group_id)
     if group_info:
         posts_info = get_posts_info(group_id, group_info.members_count)
         group_info.result_of_check.reposts = posts_info['reposts']
         group_info.result_of_check.reposts = posts_info['hashtags']
         group_info.result_of_check.average_time_between_posts = posts_info['average_time_between_posts']
         group_info.result_of_check.er = posts_info['er']
-        if user_access_token:
-            group_info.can_message = can_message_to_group(group_id, user_access_token)
-
         return group_info
     return None
 
@@ -27,7 +21,7 @@ def get_group_info(group_id: int | str, user_access_token=None) -> GroupInfo | N
 def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None]:
     params = {
         'group_id': group_id,
-        'fields': 'contacts,counters,cover,description,fixed_post,market,activity,members_count'
+        'fields': 'contacts,counters,cover,description,fixed_post,market,activity,members_count,can_message'
     }
     response = client.get('groups.getById', params)
     data = response['response']['groups'][0] if response.get('response') else {}
@@ -51,7 +45,7 @@ def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None]:
                 fixed_post=bool(data.get('fixed_post')),
                 market=bool(data.get('market', {}).get('enabled')),
                 status=status,
-                can_message=None,
+                can_message=bool(data['can_message']),
                 reposts=None,
                 hashtags=None,
                 average_time_between_posts=None,
