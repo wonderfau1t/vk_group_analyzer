@@ -27,7 +27,7 @@ def handle_message(user_id, message_text):
         if handler['user_state'] == state and (handler['text'] is None or handler['text'] == message_text):
             handler['func'](user_id, message_text)
             return
-    send_message(user_id, 'Команда не распознана. Список возможных команд:\nАудит', main_menu_keyboard)
+    # send_message(user_id, 'Команда не распознана. Список возможных команд:\nАудит', main_menu_keyboard)
 
 
 @message_handler(user_state='idle', text='Начать')
