@@ -44,9 +44,9 @@ def audit_handler(user_id, message_text):
     send_message(user_id, response_message, group_analysis_keyboard)
 
 
-@message_handler(user_state='awaiting_link', text='Главное меню')
+@message_handler(user_state='awaiting_link', text='Выйти из аудита')
 def main_menu_handler(user_id, message_text):
-    response_message = 'Возвращаю в главное меню'
+    response_message = 'Выхожу из состояния аудита. Если хотите начать аудит сообщества, введите в любой момент команду "Аудит"'
     set_user_state(user_id, 'idle')
     send_message(user_id, response_message, main_menu_keyboard)
 

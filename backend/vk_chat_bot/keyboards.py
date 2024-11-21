@@ -20,7 +20,7 @@ group_analysis_keyboard = dumps({
             {
                 'action': {
                     'type': 'text',
-                    'label': 'Главное меню',
+                    'label': 'Выйти из аудита',
                 },
                 'color': 'primary'
             }
