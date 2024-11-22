@@ -24,7 +24,7 @@ def message_handler(user_state=None, text=None):
 def handle_message(user_id, message_text):
     state = get_user_state(user_id)
     for handler in handlers:
-        if handler['user_state'] == state and (handler['text'] is None or handler['text'] == message_text):
+        if handler['user_state'] == state and (handler['text'] is None or handler['text'] == message_text.lower()):
             handler['func'](user_id, message_text)
             return
     # send_message(user_id, 'Команда не распознана. Список возможных команд:\nАудит', main_menu_keyboard)
