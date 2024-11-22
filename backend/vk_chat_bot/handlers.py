@@ -30,21 +30,21 @@ def handle_message(user_id, message_text):
     # send_message(user_id, 'Команда не распознана. Список возможных команд:\nАудит', main_menu_keyboard)
 
 
-@message_handler(user_state='idle', text='Начать')
+@message_handler(user_state='idle', text='начать')
 def start_handler(user_id, message_text):
     response_message = 'Здравствуйте! Я помогу вам проверить оформление сообщества ВКонтакте по нескольким параметрам. Давайте начнем!'
     send_message(user_id, response_message, main_menu_keyboard)
 
 
-@message_handler(user_state='idle', text='Аудит сообщества')
-@message_handler(user_state='idle', text='Аудит')
+@message_handler(user_state='idle', text='аудит сообщества')
+@message_handler(user_state='idle', text='аудит')
 def audit_handler(user_id, message_text):
     response_message = 'Для аудита пришлите, пожалуйста, ссылку на сообщество, которое хотите проверить.'
     set_user_state(user_id, 'awaiting_link')
     send_message(user_id, response_message, group_analysis_keyboard)
 
 
-@message_handler(user_state='awaiting_link', text='Выйти из аудита')
+@message_handler(user_state='awaiting_link', text='выйти из аудита')
 def main_menu_handler(user_id, message_text):
     response_message = 'Выхожу из состояния аудита. Если хотите начать аудит сообщества, введите в любой момент команду "Аудит"'
     set_user_state(user_id, 'idle')
