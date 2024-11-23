@@ -30,3 +30,17 @@ inline_group_analysis_keyboard = dumps({
         ]
     ]
 })
+
+to_main_menu_keyboard = dumps({
+    'buttons': [
+        [
+            {
+                'action': {
+                    'type': 'text',
+                    'label': 'Выйти из аудита',
+                },
+                'color': 'primary'
+            }
+        ]
+    ]
+})

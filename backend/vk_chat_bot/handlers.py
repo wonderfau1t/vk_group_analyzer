@@ -3,7 +3,7 @@ import time
 
 from api.views import generate_response
 from vk_api_integration import get_group_info
-from .keyboards import inline_main_menu_keyboard, inline_group_analysis_keyboard
+from .keyboards import inline_main_menu_keyboard, inline_group_analysis_keyboard, to_main_menu_keyboard
 from .utils import send_message, extract_group_id, generate_message_text, set_user_state, get_user_state
 
 handlers = []
@@ -69,7 +69,9 @@ def group_link_handler(user_id, message_text):
             set_user_state(user_id, 'idle')
         else:
             send_message(user_id,
-                         'Сообщество не найдено. Убедитесь, что ссылка верна и ведет на существующую группу ВКонтакте.')
+                         'Сообщество не найдено. Убедитесь, что ссылка верна и ведет на существующую группу ВКонтакте.',
+                         to_main_menu_keyboard)
     else:
         send_message(user_id,
-                     'Не удалось найти сообщество. Пожалуйста, убедитесь, что ссылка соответствует формату: https://vk.com/… и повторите попытку')
+                     'Не удалось найти сообщество. Пожалуйста, убедитесь, что ссылка соответствует формату: https://vk.com/… и повторите попытку',
+                     to_main_menu_keyboard)
