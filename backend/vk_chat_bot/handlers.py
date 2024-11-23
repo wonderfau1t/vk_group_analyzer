@@ -32,7 +32,7 @@ def handle_message(user_id, message_text):
 
 @message_handler(user_state='idle', text='начать')
 def start_handler(user_id, message_text):
-    clear_keyboard_message = 'Очистка прошлых клавиатур'
+    clear_keyboard_message = 'Очистка прошлых клавиатур. У новых пользователей не будет этого сообщения'
     send_message(user_id, clear_keyboard_message, empty_keyboard)
     response_message = 'Здравствуйте! Я помогу вам проверить оформление сообщества ВКонтакте по нескольким параметрам. Давайте начнем!'
     send_message(user_id, response_message, inline_main_menu_keyboard)
