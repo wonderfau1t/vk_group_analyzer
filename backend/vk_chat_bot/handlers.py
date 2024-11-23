@@ -3,7 +3,7 @@ import time
 
 from api.views import generate_response
 from vk_api_integration import get_group_info
-from .keyboards import inline_main_menu_keyboard, inline_group_analysis_keyboard, to_main_menu_keyboard, main_menu_keyboard
+from .keyboards import inline_main_menu_keyboard, inline_group_analysis_keyboard, to_main_menu_keyboard, main_menu_keyboard, empty_keyboard
 from .utils import send_message, extract_group_id, generate_message_text, set_user_state, get_user_state
 
 handlers = []
@@ -32,6 +32,8 @@ def handle_message(user_id, message_text):
 
 @message_handler(user_state='idle', text='начать')
 def start_handler(user_id, message_text):
+    clear_keyboard_message = 'Очистка прошлых клавиатур'
+    send_message(user_id, clear_keyboard_message, empty_keyboard)
     response_message = 'Здравствуйте! Я помогу вам проверить оформление сообщества ВКонтакте по нескольким параметрам. Давайте начнем!'
     send_message(user_id, response_message, inline_main_menu_keyboard)
 
