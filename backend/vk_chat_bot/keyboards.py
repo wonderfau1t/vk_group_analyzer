@@ -1,6 +1,7 @@
 from json import dumps
 
 main_menu_keyboard = dumps({
+    'inline': True,
     'buttons': [
         [
             {
