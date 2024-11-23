@@ -65,7 +65,7 @@ def group_link_handler(user_id, message_text):
             pivot = len(response_messages) // 2
             time.sleep(random.randint(5, 8))
             send_message(user_id, ''.join(response_messages[:pivot]))
-            send_message(user_id, ''.join(response_messages[pivot:]))
+            send_message(user_id, ''.join(response_messages[pivot:]), main_menu_keyboard)
             send_message(user_id, '🔎 Если хотите проанализировать другое сообщество, то нажмите на "Аудит сообщества"',
                          inline_main_menu_keyboard)
             set_user_state(user_id, 'idle')
