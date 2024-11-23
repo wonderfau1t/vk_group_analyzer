@@ -17,7 +17,6 @@ inline_main_menu_keyboard = dumps({
 
 
 main_menu_keyboard = dumps({
-    'inline': True,
     'buttons': [
         [
             {
