@@ -61,15 +61,5 @@ to_main_menu_keyboard = dumps({
 })
 
 empty_keyboard = dumps({
-    'buttons': [
-        [
-            {
-                'action': {
-                    'type': 'text',
-                    'label': 'Выйти из аудита',
-                },
-                'color': 'primary'
-            }
-        ]
-    ]
+    'buttons': []
 })
