@@ -16,6 +16,22 @@ inline_main_menu_keyboard = dumps({
 })
 
 
+main_menu_keyboard = dumps({
+    'inline': True,
+    'buttons': [
+        [
+            {
+                'action': {
+                    'type': 'text',
+                    'label': 'Аудит сообщества',
+                },
+                'color': 'primary'
+            }
+        ]
+    ]
+})
+
+
 inline_group_analysis_keyboard = dumps({
     'inline': True,
     'buttons': [
@@ -32,6 +48,20 @@ inline_group_analysis_keyboard = dumps({
 })
 
 to_main_menu_keyboard = dumps({
+    'buttons': [
+        [
+            {
+                'action': {
+                    'type': 'text',
+                    'label': 'Выйти из аудита',
+                },
+                'color': 'primary'
+            }
+        ]
+    ]
+})
+
+empty_keyboard = dumps({
     'buttons': [
         [
             {
