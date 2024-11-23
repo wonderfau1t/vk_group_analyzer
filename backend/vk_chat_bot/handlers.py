@@ -3,7 +3,7 @@ import time
 
 from api.views import generate_response
 from vk_api_integration import get_group_info
-from .keyboards import main_menu_keyboard, group_analysis_keyboard
+from .keyboards import inline_main_menu_keyboard, inline_group_analysis_keyboard
 from .utils import send_message, extract_group_id, generate_message_text, set_user_state, get_user_state
 
 handlers = []
@@ -33,7 +33,7 @@ def handle_message(user_id, message_text):
 @message_handler(user_state='idle', text='начать')
 def start_handler(user_id, message_text):
     response_message = 'Здравствуйте! Я помогу вам проверить оформление сообщества ВКонтакте по нескольким параметрам. Давайте начнем!'
-    send_message(user_id, response_message, main_menu_keyboard)
+    send_message(user_id, response_message, inline_main_menu_keyboard)
 
 
 @message_handler(user_state='idle', text='аудит сообщества')
@@ -41,14 +41,14 @@ def start_handler(user_id, message_text):
 def audit_handler(user_id, message_text):
     response_message = 'Для аудита пришлите, пожалуйста, ссылку на сообщество, которое хотите проверить.'
     set_user_state(user_id, 'awaiting_link')
-    send_message(user_id, response_message, group_analysis_keyboard)
+    send_message(user_id, response_message, inline_group_analysis_keyboard)
 
 
 @message_handler(user_state='awaiting_link', text='выйти из аудита')
 def main_menu_handler(user_id, message_text):
     response_message = 'Выхожу из состояния аудита. Если хотите начать аудит сообщества, введите в любой момент команду "Аудит"'
     set_user_state(user_id, 'idle')
-    send_message(user_id, response_message, main_menu_keyboard)
+    send_message(user_id, response_message, inline_main_menu_keyboard)
 
 
 @message_handler(user_state='awaiting_link')
@@ -65,7 +65,7 @@ def group_link_handler(user_id, message_text):
             send_message(user_id, ''.join(response_messages[:pivot]))
             send_message(user_id, ''.join(response_messages[pivot:]))
             send_message(user_id, '🔎 Если хотите проанализировать другое сообщество, то нажмите на "Аудит сообщества"',
-                         main_menu_keyboard)
+                         inline_main_menu_keyboard)
             set_user_state(user_id, 'idle')
         else:
             send_message(user_id,

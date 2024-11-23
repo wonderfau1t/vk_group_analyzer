@@ -1,6 +1,6 @@
 from json import dumps
 
-main_menu_keyboard = dumps({
+inline_main_menu_keyboard = dumps({
     'inline': True,
     'buttons': [
         [
@@ -15,7 +15,9 @@ main_menu_keyboard = dumps({
     ]
 })
 
-group_analysis_keyboard = dumps({
+
+inline_group_analysis_keyboard = dumps({
+    'inline': True,
     'buttons': [
         [
             {
