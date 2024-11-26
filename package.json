@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@vkontakte/vk-miniapps-deploy": "^0.1.8",
     "@vkontakte/vk-tunnel": "^0.2.2"
   }
 }

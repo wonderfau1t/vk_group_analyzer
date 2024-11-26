@@ -1,4 +1,4 @@
-import { Panel, PanelHeader, Group, Cell, Div, Avatar, Search, Separator, SegmentedControl, Title, Spacing, CustomScrollView, List, Placeholder, Tappable, Button } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Cell, Div, Avatar, Search, Separator, SegmentedControl, Title, Spacing, Placeholder, ScreenSpinner } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge';
 import { useState, useEffect } from 'react';
 import {Icon56InfoOutline} from '@vkontakte/icons';
@@ -9,6 +9,7 @@ export const Home = ({ id, fetchedToken, onGroupClick }) => {
   const [selectedTab, setSelectedTab] = useState('subscribes');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedGroups, setSearchedGroups] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const searchAllGroups = async (query) => {
     const response = await bridge.send("VKWebAppCallAPIMethod", {
@@ -53,6 +54,7 @@ export const Home = ({ id, fetchedToken, onGroupClick }) => {
 
       setSubscribedGroups(allGroups.filter((group) => !group.is_admin));
       setAdministeredGroups(allGroups.filter((group) => group.is_admin));
+      setIsLoading(false);
     };
 
     fetchAndSplitGroups();
@@ -69,10 +71,19 @@ export const Home = ({ id, fetchedToken, onGroupClick }) => {
     ? administeredGroups.filter((group) => group.name.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase()))
     : searchedGroups;
 
+  if (isLoading) {
+    return (
+      <Panel id={id}>
+        <PanelHeader>Аудит групп</PanelHeader>
+        <ScreenSpinner size='large' caption='Загружаем данные о группах'>Поиск групп</ScreenSpinner>
+      </Panel>
+    );
+  }
+
   return (
     <Panel id={id}>
-      <PanelHeader>Анализ групп</PanelHeader>
-        <Group header={<Title level='1' style={{marginBottom: 10, paddingTop: 20, paddingLeft: 20}}>Выберите группу для анализа</Title>}>
+      <PanelHeader>Аудит групп</PanelHeader>
+        <Group header={<Title level='1' style={{marginBottom: 10, paddingTop: 20, paddingLeft: 20}}>Выберите группу для аудита</Title>}>
           <Spacing size={16}>
             <Separator/>
           </Spacing>
@@ -91,7 +102,7 @@ export const Home = ({ id, fetchedToken, onGroupClick }) => {
                     value: 'administered',
                   },
                   {
-                    label: 'Поиск по всем группам',
+                    label: 'Все',
                     value: 'all',
                   },
                 ]}
@@ -100,18 +111,19 @@ export const Home = ({ id, fetchedToken, onGroupClick }) => {
             </Div>
             <Group>
               {groupsToDisplay.length > 0 ? (
-                <CustomScrollView windowResize={true} style={{height: 350}}>
+                <Div style={{padding: '0px'}}>
                   {groupsToDisplay.map((group) => (
                     <Cell
                       key={group.id}
                       before={group.photo_100 ? <Avatar src={group.photo_100} /> : null}
                       subtitle={group.activity}
                       onClick={() => onGroupClick(group.id)}
+                      style={{padding: '5px 5px 0 5px'}}
                     >
                       {group.name}
                     </Cell>
                   ))}
-                </CustomScrollView>
+                </Div>
               ) : (
                 <Placeholder icon={<Icon56InfoOutline/>} header='Нет групп, соответствующих вашему запросу'>
                   Перейдите во вкладку «Поиск по всем группам» и попробуйте найти там
