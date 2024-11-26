@@ -41,6 +41,8 @@ def start_handler(user_id, message_text):
 @message_handler(user_state='idle', text='аудит сообщества')
 @message_handler(user_state='idle', text='аудит')
 def audit_handler(user_id, message_text):
+    response_message = 'Чат переходит в режим аудита, далее бот будет ожидать только ссылку. Это сообщение нужно, чтобы снизу тоже появилась кнопка "Выйти из аудита"'
+    send_message(user_id, response_message, to_main_menu_keyboard)
     response_message = 'Для аудита пришлите, пожалуйста, ссылку на сообщество, которое хотите проверить.'
     set_user_state(user_id, 'awaiting_link')
     send_message(user_id, response_message, inline_group_analysis_keyboard)
