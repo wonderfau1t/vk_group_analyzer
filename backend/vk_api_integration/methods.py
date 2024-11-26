@@ -6,37 +6,30 @@ from .client import client
 from .models import GroupInfo, ResultOfCheck
 
 
-def get_group_info(group_id: int | str, user_access_token=None) -> GroupInfo | None:
-    if user_access_token:
-        group_info, group_id = get_main_info(group_id, user_access_token)
-    else:
-        group_info, group_id = get_main_info(group_id)
+def get_group_info(group_id: int | str) -> GroupInfo | None:
+    group_info, group_id = get_main_info(group_id)
     if group_info:
         posts_info = get_posts_info(group_id, group_info.members_count)
         group_info.result_of_check.reposts = posts_info['reposts']
         group_info.result_of_check.reposts = posts_info['hashtags']
         group_info.result_of_check.average_time_between_posts = posts_info['average_time_between_posts']
         group_info.result_of_check.er = posts_info['er']
-        if user_access_token:
-            group_info.can_message = can_message_to_group(group_id, user_access_token)
-
         return group_info
     return None
 
 
-def get_main_info(group_id: int, user_access_token=None) -> Tuple[GroupInfo, int] | Tuple[None, None]:
+def get_main_info(group_id: int) -> Tuple[GroupInfo, int] | Tuple[None, None] | dict:
     params = {
         'group_id': group_id,
-        'fields': 'contacts,counters,cover,description,fixed_post,market,activity,members_count'
+        'fields': 'contacts,counters,cover,description,fixed_post,market,activity,members_count,can_message'
     }
-    if user_access_token:
-        response = client.get('groups.getById', params, access_token=user_access_token)
-    else:
-        response = client.get('groups.getById', params)
+    response = client.get('groups.getById', params)
     data = response['response']['groups'][0] if response.get('response') else {}
 
     if bool(data.get('name')):
-        online_response = client.get('groups.getOnlineStatus', params={'group_id': group_id})
+        if data.get('is_closed'):
+            return None, None
+        online_response = client.get('groups.getOnlineStatus', params={'group_id': data.get('id')})
         status = online_response.get('response', {}).get('status') == 'online'
 
         return GroupInfo(
@@ -47,14 +40,14 @@ def get_main_info(group_id: int, user_access_token=None) -> Tuple[GroupInfo, int
             members_count=data.get('members_count'),
             result_of_check=ResultOfCheck(
                 contacts=bool(data.get('contacts')),
-                cover=bool(data.get('cover')),
+                cover=bool(data.get('cover', {}).get('enabled')),
                 clips=(data['counters'].get('clips', 0) > 0),
                 screen_name=bool(data.get('screen_name')),
                 description=bool(data.get('description')),
                 fixed_post=bool(data.get('fixed_post')),
-                market=bool(data.get('market')),
+                market=bool(data.get('market', {}).get('enabled')),
                 status=status,
-                can_message=None,
+                can_message=bool(data['can_message']),
                 reposts=None,
                 hashtags=None,
                 average_time_between_posts=None,
@@ -76,7 +69,8 @@ def get_posts_info(group_id: int, members_count: int):
     reposts_exists = bool(sum(1 for post in recent_posts if 'copy_history' in post))
     hashtags_exists = bool(sum(1 for post in recent_posts if re.search(r'#\w+', post.get('text', ''))))
     average_time_between_posts = get_average_time_between_posts(recent_posts)
-    er = round(sum(post['comments']['count'] + post['likes']['count'] + post['reposts']['count'] for post in recent_posts) / members_count * 100, 2)
+    er = round(sum(post['comments']['count'] + post['likes']['count'] + post['reposts']['count'] for post in
+                   recent_posts) / members_count * 100, 2)
 
     return {
         'reposts': reposts_exists,
@@ -100,6 +94,10 @@ def can_message_to_group(group_id: int, user_access_token: str) -> bool:
 
 
 def get_average_time_between_posts(posts) -> dict:
+    if len(posts) < 2:
+        return {
+            'error_message': 'За месяц менее 2х постов'
+        }
     timestamps = sorted([post['date'] for post in posts], reverse=True)
     intervals = [timestamps[i] - timestamps[i + 1] for i in range(len(timestamps) - 1)]
     average_interval = sum(intervals) / len(intervals)
