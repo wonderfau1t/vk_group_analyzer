@@ -37,7 +37,7 @@ function threatJsFilesAsJsx() {
  */
 export default defineConfig({
   base: './',
-
+  
   plugins: [
     react(),
     threatJsFilesAsJsx(),
@@ -59,6 +59,12 @@ export default defineConfig({
   server: {
     port: 5173,
     host: 'localhost',
+    strictPort: true,
+    allowedHosts: [
+      'localhost',
+      'tunnel.wonderrfau1t.site',
+      '.wonderrfau1t.site'
+    ],
     hmr: {
       protocol: 'ws',
       host: 'localhost',

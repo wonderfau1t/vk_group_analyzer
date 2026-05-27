@@ -2,7 +2,6 @@ import {
   Panel,
   PanelHeader,
   PanelHeaderBack,
-  Div, 
   Group, 
   Image, 
   Title,
@@ -10,9 +9,17 @@ import {
   SegmentedControl,
   Placeholder,
   Card,
-  ScreenSpinner} from "@vkontakte/vkui";
+  ScreenSpinner,
+  Flex,
+  Button,
+  Spacing,
+  Avatar,
+  Div,
+  Spinner,
+} from "@vkontakte/vkui";
 import { useState, useEffect } from "react";
 import { Icon20ListAddOutline, Icon16UserOutline, Icon56ReportOutline } from '@vkontakte/icons';
+import bridge from "@vkontakte/vk-bridge";
 
 const ProgressBar = ({ score }) => (
   <Div style={{ width: '50%', padding: '0'}}>
@@ -57,7 +64,7 @@ const CardItem = ({ title, description, backgroundColor, textColor }) => (
       }}>
         {title}
       </Text>
-      <Div style={{ display: 'flex', padding: '0', gap: '6px', padding: '10px 26px' }}>
+      <Div style={{ display: 'flex', gap: '6px', padding: '10px 26px' }}>
         <Div className="description__icon" style={{ padding: '0' }}>
           <Icon20ListAddOutline />
         </Div>
@@ -79,33 +86,100 @@ const CardItem = ({ title, description, backgroundColor, textColor }) => (
   </div>
 );
 
-export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
+const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
   const [selectedTab, setSelectedTab] = useState('good');
   const [groupInfo, setGroupInfo] = useState({});
+
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [launchParams, setLaunchParams] = useState(null);
 
   const handleTabChange = (value) => {
     setSelectedTab(value);
   };
 
   useEffect(() => {
+    async function getLaunchParams() {
+      try {
+        const params = await bridge.send("VKWebAppGetLaunchParams");
+        setLaunchParams(params);
+      } catch (error) {
+        console.error("Ошибка получения launchParams:", error);
+      }
+    }
+
+    if (!launchParams) {
+      getLaunchParams();
+    }
+  })
+
+  useEffect(() => {
     async function GetInfoAboutGroup() {
-        const params = new URLSearchParams({
-          group_id: groupId,
-        });
-        const response = await fetch(`https://groupanalyzer.ru/api/check_group?${params.toString()}`, {
+      if (!groupId || !fetchedToken?.access_token || !launchParams) {
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const launchParams = await bridge.send('VKWebAppGetLaunchParams');
+
+        const response = await fetch(`https://vk.wonderrfau1t.site/api/v1/analyzer/${groupId}`, {
           method: 'GET',
           headers: {
             "Content-Type": "application/json",
+            "X-VK-Access-Token": fetchedToken?.access_token,
+            "X-VK-Launch-Params": JSON.stringify(launchParams),
           }
         });
-  
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         setGroupInfo(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
         setIsLoading(false);
+      }
     };
+
     GetInfoAboutGroup();
-  }, [groupId, fetchedToken] );
+  }, [groupId, fetchedToken, launchParams]);
+
+  const [marketingGroup, setMarketingGroup] = useState(null);
+
+  useEffect(() => {
+    async function fetchMarketingGroup() {
+      if (!fetchedToken?.access_token) {
+        return;
+      }
+
+      try {
+        const result = await bridge.send("VKWebAppCallAPIMethod", {
+          method: "groups.getById",
+          params: {
+            group_id: "lesya_ostashova.targetolog",
+            fields: "photo_200",
+            v: "5.131",
+            access_token: fetchedToken.access_token 
+          }
+        });
+        
+        if (result.response && result.response[0]) {
+          setMarketingGroup(result.response[0]);
+        }
+      } catch (e) {
+        console.error("Ошибка при получении данных маркетолога:", e);
+      }
+    }
+
+    fetchMarketingGroup();
+    // Добавляем fetchedToken в зависимости, чтобы запрос ушел, как только токен появится
+  }, [fetchedToken]);
 
   function formatMembersCount(count) {
 
@@ -134,8 +208,8 @@ export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
   if (isLoading) {
     return (
       <Panel id={id} >
-        <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>Аудит групп</PanelHeader>
-        <ScreenSpinner size='large' caption='Проводим аудит группы'>Идет аудит выбранной группы</ScreenSpinner>
+        <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>Аудит группы</PanelHeader>
+        <ScreenSpinner size='large' caption='Загружаем данные о группах'>Идет аудит выбранной группы</ScreenSpinner>
       </Panel>
     );
   }
@@ -143,7 +217,7 @@ export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
   if (groupInfo.error_message) {
     return (
       <Panel id={id}>
-        <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>Аудит групп</PanelHeader>
+        <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>Аудит группы</PanelHeader>
         <Placeholder icon={<Icon56ReportOutline/>} header='Это закрытая группа, провести аудит невозможно!'>
           Вернитесь на главную страницу и выберите другую группу для аудита
         </Placeholder>
@@ -151,10 +225,25 @@ export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
     );
   }
 
+  const goToGroup = () => {
+    bridge.send("VKWebAppJoinGroup", { 
+      group_id: 48544404
+    })
+    .then((data) => {
+      if (data.result) {
+        console.log("Пользователь подписался или уже подписан");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      window.open("https://vk.com/lesya_ostashova.targetolog", "_blank");
+    });
+  };
+
   return (
     <Panel id={id}>
       <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>
-        Аудит групп
+        Аудит группы
       </PanelHeader>
       <Group>
         <Div>
@@ -176,6 +265,52 @@ export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
           </div>
         </Div>      
       </Group>
+
+      <Group
+        mode="card"
+        style={{
+          borderRadius: "16px", // Чуть мягче углы
+          DivShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // Более глубокая тень для выделения
+          margin: "12px 8px",
+          background: "linear-gradient(135deg, #ffffff 0%, #f9faff 100%)", // Легкий градиент на фоне
+          border: "1px solid #e1e3e6"
+        }}
+      >
+        <Div>
+          <Flex direction="column" style={{ gap: '12px' }}>
+            <Flex style={{ gap: '12px' }} align="center">
+              <Avatar size={80} src={marketingGroup?.photo_200} alt="Аватар группы" />
+              <div style={{ flex: 1 }}>
+                <Title level="3" style={{ color: "var(--vkui--color_text_accent)", marginBottom: 4 }}>
+                  Клиенты из интернета с Лесей Осташовой
+                </Title>
+                <Text weight="2" style={{ color: "#818c99", fontSize: '14px' }}>
+                  Итенсивы и марафоны по продвижению ВКонтакте
+                </Text>
+              </div>
+            </Flex>
+            
+            <Text style={{ lineHeight: '1.5' }}>
+              Группа не приносит нужных результатов?! Разберем, почему ваша реклама не работает и узнаем
+              все лайфхаки продвижения ВКонтакте. 
+              <br />
+              <b>Подписывайся, здесь много полезной информации 😊</b>
+            </Text>
+
+            <Button
+              size="l"
+              appearance="accent"
+              stretched
+              rounded
+              onClick={goToGroup}
+              style={{ height: '44px' }}
+            >
+              Подписаться
+            </Button>
+          </Flex>
+        </Div>
+      </Group>
+
       <Group>
         <Div>
           <SegmentedControl
@@ -218,3 +353,5 @@ export const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
     </Panel>
   )
 };
+
+export default AnalysedGroup;
