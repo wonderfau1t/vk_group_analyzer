@@ -12,14 +12,20 @@ import {
   ScreenSpinner,
   Flex,
   Button,
-  Spacing,
   Avatar,
   Div,
-  Spinner,
+  ModalRoot,
+  ModalCard,
 } from "@vkontakte/vkui";
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { Icon20ListAddOutline, Icon16UserOutline, Icon56ReportOutline } from '@vkontakte/icons';
 import bridge from "@vkontakte/vk-bridge";
+import { openExternalLink } from "../utils/openExternalLink";
+
+const MARKETING_GROUP_SCREEN_NAME = "lesya_ostashova.targetolog";
+const MARKETING_GROUP_URL = `https://vk.com/${MARKETING_GROUP_SCREEN_NAME}`;
+const SUBSCRIPTION_MODAL_ID = "marketing-group-subscription";
 
 const ProgressBar = ({ score }) => (
   <Div style={{ width: '50%', padding: '0'}}>
@@ -86,12 +92,24 @@ const CardItem = ({ title, description, backgroundColor, textColor }) => (
   </div>
 );
 
+ProgressBar.propTypes = {
+  score: PropTypes.number,
+};
+
+CardItem.propTypes = {
+  title: PropTypes.string,
+  description: PropTypes.string,
+  backgroundColor: PropTypes.string,
+  textColor: PropTypes.string,
+};
+
 const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
   const [selectedTab, setSelectedTab] = useState('good');
   const [groupInfo, setGroupInfo] = useState({});
+  const [activeModal, setActiveModal] = useState(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
 
   const [launchParams, setLaunchParams] = useState(null);
 
@@ -145,7 +163,7 @@ const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     GetInfoAboutGroup();
   }, [groupId, fetchedToken, launchParams]);
@@ -162,7 +180,7 @@ const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
         const result = await bridge.send("VKWebAppCallAPIMethod", {
           method: "groups.getById",
           params: {
-            group_id: "lesya_ostashova.targetolog",
+            group_id: MARKETING_GROUP_SCREEN_NAME,
             fields: "photo_200",
             v: "5.131",
             access_token: fetchedToken.access_token 
@@ -225,133 +243,157 @@ const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
     );
   }
 
-  const goToGroup = () => {
-    bridge.send("VKWebAppJoinGroup", { 
-      group_id: 48544404
-    })
-    .then((data) => {
-      if (data.result) {
-        console.log("Пользователь подписался или уже подписан");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      window.open("https://vk.com/lesya_ostashova.targetolog", "_blank");
-    });
+  const showSubscriptionModal = () => {
+    setActiveModal(SUBSCRIPTION_MODAL_ID);
   };
 
+  const openMarketingGroup = () => {
+    setActiveModal(null);
+    openExternalLink(MARKETING_GROUP_URL);
+  };
+
+  const modals = (
+    <ModalRoot activeModal={activeModal} onClose={() => setActiveModal(null)}>
+      <ModalCard
+        id={SUBSCRIPTION_MODAL_ID}
+        onClose={() => setActiveModal(null)}
+        dismissLabel="Закрыть"
+        icon={<Avatar size={72} src={marketingGroup?.photo_200} alt="Аватар группы" />}
+        header="Вы уже подписаны"
+        subheader="Вы уже подписаны на эту группу. Можно перейти в группу и посмотреть материалы."
+        actions={
+          <Button size="l" mode="primary" stretched onClick={openMarketingGroup}>
+            Перейти в группу
+          </Button>
+        }
+      />
+    </ModalRoot>
+  );
+
   return (
-    <Panel id={id}>
-      <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>
-        Аудит группы
-      </PanelHeader>
-      <Group>
-        <Div>
-          <div className="group-info__container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <div className="groupInfo" style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
-              <Title level="1">{groupInfo.name}</Title>
-              <Text style={{fontSize: '18px'}}>{groupInfo.activity}</Text>
-              <div className="members__container" style={{display: 'flex', alignItems: 'center', color: '#818c99'}}>
-                <Icon16UserOutline />
-                <Text>{formatMembersCount(groupInfo.members_count)}</Text>
+    <>
+      <Panel id={id}>
+        <PanelHeader before={<PanelHeaderBack onClick={onBackClick}/>}>
+          Аудит группы
+        </PanelHeader>
+        <Group>
+          <Div>
+            <div className="group-info__container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+              <div className="groupInfo" style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                <Title level="1">{groupInfo.name}</Title>
+                <Text style={{fontSize: '18px'}}>{groupInfo.activity}</Text>
+                <div className="members__container" style={{display: 'flex', alignItems: 'center', color: '#818c99'}}>
+                  <Icon16UserOutline />
+                  <Text>{formatMembersCount(groupInfo.members_count)}</Text>
+                </div>
+              </div>
+              <div className="groupImage">
+                <Image src={groupInfo.photo_200} alt="Аватар группы" size={96}/>
               </div>
             </div>
-            <div className="groupImage">
-              <Image src={groupInfo.photo_200} alt="Аватар группы" size={96}/>
+            <div className="progressBar" style={{marginTop: '20px'}}>
+              <ProgressBar score={groupInfo.score} />
             </div>
-          </div>
-          <div className="progressBar" style={{marginTop: '20px'}}>
-            <ProgressBar score={groupInfo.score} />
-          </div>
-        </Div>      
-      </Group>
+          </Div>      
+        </Group>
 
-      <Group
-        mode="card"
-        style={{
-          borderRadius: "16px", // Чуть мягче углы
-          DivShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // Более глубокая тень для выделения
-          margin: "12px 8px",
-          background: "linear-gradient(135deg, #ffffff 0%, #f9faff 100%)", // Легкий градиент на фоне
-          border: "1px solid #e1e3e6"
-        }}
-      >
-        <Div>
-          <Flex direction="column" style={{ gap: '12px' }}>
-            <Flex style={{ gap: '12px' }} align="center">
-              <Avatar size={80} src={marketingGroup?.photo_200} alt="Аватар группы" />
-              <div style={{ flex: 1 }}>
-                <Title level="3" style={{ color: "var(--vkui--color_text_accent)", marginBottom: 4 }}>
-                  Клиенты из интернета с Лесей Осташовой
-                </Title>
-                <Text weight="2" style={{ color: "#818c99", fontSize: '14px' }}>
-                  Итенсивы и марафоны по продвижению ВКонтакте
-                </Text>
-              </div>
+        <Group
+          mode="card"
+          style={{
+            borderRadius: "16px", // Чуть мягче углы
+            DivShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // Более глубокая тень для выделения
+            margin: "12px 8px",
+            background: "linear-gradient(135deg, #ffffff 0%, #f9faff 100%)", // Легкий градиент на фоне
+            border: "1px solid #e1e3e6"
+          }}
+        >
+          <Div>
+            <Flex direction="column" style={{ gap: '12px' }}>
+              <Flex style={{ gap: '12px' }} align="center">
+                <Avatar size={80} src={marketingGroup?.photo_200} alt="Аватар группы" />
+                <div style={{ flex: 1 }}>
+                  <Title level="3" style={{ color: "var(--vkui--color_text_accent)", marginBottom: 4 }}>
+                    Клиенты из интернета с Лесей Осташовой
+                  </Title>
+                  <Text weight="2" style={{ color: "#818c99", fontSize: '14px' }}>
+                    Итенсивы и марафоны по продвижению ВКонтакте
+                  </Text>
+                </div>
+              </Flex>
+              
+              <Text style={{ lineHeight: '1.5' }}>
+                Группа не приносит нужных результатов?! Разберем, почему ваша реклама не работает и узнаем
+                все лайфхаки продвижения ВКонтакте. 
+                <br />
+                <b>Подписывайся, здесь много полезной информации 😊</b>
+              </Text>
+
+              <Button
+                size="l"
+                appearance="accent"
+                stretched
+                rounded
+                onClick={showSubscriptionModal}
+                style={{ height: '44px' }}
+              >
+                Подписаться
+              </Button>
             </Flex>
-            
-            <Text style={{ lineHeight: '1.5' }}>
-              Группа не приносит нужных результатов?! Разберем, почему ваша реклама не работает и узнаем
-              все лайфхаки продвижения ВКонтакте. 
-              <br />
-              <b>Подписывайся, здесь много полезной информации 😊</b>
-            </Text>
-
-            <Button
-              size="l"
-              appearance="accent"
-              stretched
-              rounded
-              onClick={goToGroup}
-              style={{ height: '44px' }}
-            >
-              Подписаться
-            </Button>
-          </Flex>
-        </Div>
-      </Group>
-
-      <Group>
-        <Div>
-          <SegmentedControl
-            name='info'
-            options={[
-              {
-                label: 'Все отлично',
-                value: 'good',
-              },
-              {
-                label: 'Следует исправить',
-                value: 'correct',
-              },
-            ]}
-            onChange={handleTabChange}
-          />
-          <Div style={{ padding: '0px', color: '#6d7885' }}>
-            {selectedTab === 'good' && categories.good.data && categories.good.data.length > 0
-              ? categories.good.data.map((card) => (
-                  <CardItem key={card.id} title={card.title} description={card.description}
-                            backgroundColor={categories.good.bgColor} textColor={categories.good.textColor} />
-                ))
-              : selectedTab === 'correct' && (
-                  <>
-                    {categories.bad.data && categories.bad.data.length > 0 &&
-                      categories.bad.data.map((card) => (
-                        <CardItem key={card.id} title={card.title} description={card.description}
-                                  backgroundColor={categories.bad.bgColor} textColor={categories.bad.textColor} />
-                      ))}
-                    {categories.normal.data && categories.normal.data.length > 0 &&
-                      categories.normal.data.map((card) => (
-                        <CardItem key={card.id} title={card.title} description={card.description}
-                                  backgroundColor={categories.normal.bgColor} textColor={categories.normal.textColor} />
-                      ))}
-                  </>
-              )}
           </Div>
-        </Div>
-      </Group>
-    </Panel>
+        </Group>
+
+        <Group>
+          <Div>
+            <SegmentedControl
+              name='info'
+              options={[
+                {
+                  label: 'Все отлично',
+                  value: 'good',
+                },
+                {
+                  label: 'Следует исправить',
+                  value: 'correct',
+                },
+              ]}
+              onChange={handleTabChange}
+            />
+            <Div style={{ padding: '0px', color: '#6d7885' }}>
+              {selectedTab === 'good' && categories.good.data && categories.good.data.length > 0
+                ? categories.good.data.map((card) => (
+                    <CardItem key={card.id} title={card.title} description={card.description}
+                              backgroundColor={categories.good.bgColor} textColor={categories.good.textColor} />
+                  ))
+                : selectedTab === 'correct' && (
+                    <>
+                      {categories.bad.data && categories.bad.data.length > 0 &&
+                        categories.bad.data.map((card) => (
+                          <CardItem key={card.id} title={card.title} description={card.description}
+                                    backgroundColor={categories.bad.bgColor} textColor={categories.bad.textColor} />
+                        ))}
+                      {categories.normal.data && categories.normal.data.length > 0 &&
+                        categories.normal.data.map((card) => (
+                          <CardItem key={card.id} title={card.title} description={card.description}
+                                    backgroundColor={categories.normal.bgColor} textColor={categories.normal.textColor} />
+                        ))}
+                    </>
+                )}
+            </Div>
+          </Div>
+        </Group>
+      </Panel>
+      {modals}
+    </>
   )
+};
+
+AnalysedGroup.propTypes = {
+  id: PropTypes.string,
+  onBackClick: PropTypes.func,
+  groupId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  fetchedToken: PropTypes.shape({
+    access_token: PropTypes.string,
+  }),
 };
 
 export default AnalysedGroup;

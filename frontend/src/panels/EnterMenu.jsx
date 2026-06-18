@@ -10,9 +10,19 @@ import {
   Title,
 } from "@vkontakte/vkui";
 
+import mainMenuBackground from "../assets/main-menu-background.png";
+import groupAnalyserLogo from "../assets/group-analyser-logo.jpg";
+import aiGeneratorLogo from "../assets/ai-generator-logo.jpg";
+
 const EnterMenu = ({ id, goToAudit, goToContent }) => {
   return (
-    <Panel id={id}>
+    <Panel
+      id={id}
+      className="enter-menu-panel"
+      style={{
+        "--enter-menu-background": `url(${mainMenuBackground})`,
+      }}
+    >
       <PanelHeader>
         Меню
       </PanelHeader>
@@ -35,7 +45,7 @@ const EnterMenu = ({ id, goToAudit, goToContent }) => {
           <Div>
             <Flex direction="column" style={{ gap: '10px'}}>
               <Flex style={{ gap: '10px'}} align="center">
-                <Image size={64} />
+                <Image size={64} src={groupAnalyserLogo} />
                 <Title level="3">Аудит сообществ</Title>
               </Flex>
               <Text>
@@ -65,7 +75,7 @@ const EnterMenu = ({ id, goToAudit, goToContent }) => {
           <Div>
             <Flex direction="column" style={{ gap: '10px'}}>
               <Flex style={{ gap: '10px'}} align="center">
-                <Image size={64} />
+                <Image size={64} src={aiGeneratorLogo} />
                 <Title level="3">Генерация контента</Title>
               </Flex>
               <Text>

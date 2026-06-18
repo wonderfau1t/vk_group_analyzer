@@ -75,5 +75,16 @@ export const generationService = {
       }
     });
     return response.data;
+  },
+
+  getCosts: async () => {
+    const launchParams = await bridge.send('VKWebAppGetLaunchParams');
+    const response = await api.get("/generator/costs", {
+      headers: {
+        "Content-Type": "application/json",
+        "X-VK-Launch-Params": JSON.stringify(launchParams),
+      }
+    });
+    return response.data;
   }
 };

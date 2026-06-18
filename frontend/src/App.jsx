@@ -57,7 +57,7 @@ const goToPastGeneratedContent = useCallback(() => {
         });
         setToken(token);
       } else {
-        setActivePanel("auth")
+        setActiveStory("auth")
       }
     }
     fetchData();
@@ -70,7 +70,7 @@ const goToPastGeneratedContent = useCallback(() => {
             id="auth"
             onAuthComplete={({ token }) => {
               setToken(token);
-              setActivePanel("menu");
+              setActiveStory("menu");
             }}
           />
         </View>

@@ -14,7 +14,26 @@ import {
   Icon20Flash
 } from "@vkontakte/icons";
 
+import useGenerationStore from "../stores/useGenerationStore";
+import { formatGenerationCost } from "../utils/generationCosts";
+
 const TokensInfoModal = ({ id, onClose }) => {
+  const {
+    generationCosts,
+    isCostsLoading,
+    costsError,
+  } = useGenerationStore();
+
+  const postCost = formatGenerationCost(generationCosts.post);
+  const imageCost = formatGenerationCost(generationCosts.image);
+  const costText = (value) => {
+    if (isCostsLoading) {
+      return "Загрузка...";
+    }
+
+    return value ?? "Недоступно";
+  };
+
   return (
     <ModalPage
       id={id}
@@ -53,7 +72,7 @@ const TokensInfoModal = ({ id, onClose }) => {
                   <ContentBadge.SlotIcon>
                     <Icon20Flash  />
                   </ContentBadge.SlotIcon>
-                  1 токен
+                  {costText(postCost)}
                 </ContentBadge>
               </Flex>
               
@@ -66,9 +85,14 @@ const TokensInfoModal = ({ id, onClose }) => {
                   <ContentBadge.SlotIcon>
                     <Icon20Flash  />
                   </ContentBadge.SlotIcon>
-                  5 токенов
+                  {costText(imageCost)}
                 </ContentBadge>
               </Flex>
+              {costsError && (
+                <div style={{ fontSize: "12px", color: "var(--vkui--color_text_negative)", padding: "8px" }}>
+                  Не удалось обновить стоимость генерации
+                </div>
+              )}
             </div>
           </InfoRow>
         </Div>

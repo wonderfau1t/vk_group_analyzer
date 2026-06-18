@@ -50,17 +50,19 @@ const ContentGenerating = ({ id, goToMenu, goToPastGeneratedContent }) => {
     checkAndStartPolling,
     stopPolling,
     fetchBalance,
+    fetchCosts,
     reset,
   } = useGenerationStore();
 
   useEffect(() => {
     fetchBalance();
+    fetchCosts();
     checkAndStartPolling();
 
     return () => {
       stopPolling();
     };
-  }, [fetchBalance, checkAndStartPolling, stopPolling]);
+  }, [fetchBalance, fetchCosts, checkAndStartPolling, stopPolling]);
 
   const handleTabChange = (value) => {
     setActiveTab(value);
@@ -96,7 +98,10 @@ const ContentGenerating = ({ id, goToMenu, goToPastGeneratedContent }) => {
                 {balance} токенов
               </ContentBadge>
               <Button mode="tertiary" before={<Icon20InfoCircleOutline />} rounded aria-label="Информация о токенах"
-                onClick={() => setActiveModal('tokens-info')}  
+                onClick={() => {
+                  fetchCosts();
+                  setActiveModal('tokens-info');
+                }}  
               />
             </div>
             <Button
@@ -106,7 +111,7 @@ const ContentGenerating = ({ id, goToMenu, goToPastGeneratedContent }) => {
               aria-label="Подписаться"
               onClick={() => setActiveModal('subscribe')}
             >
-              Подписка
+              Получить еще токены
             </Button>
           </Flex>
           <Spacing size="2xl" />

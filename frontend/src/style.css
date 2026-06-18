@@ -1,4 +1,9 @@
 /* html, body, #root, .vkui__root, .vkuiPanel__in {
   background-color: #ebedf0 !important;
 } */
+
+.enter-menu-panel .vkuiPanel__in {
+  min-height: 100vh;
+  background: var(--enter-menu-background) center / cover no-repeat !important;
+}
  

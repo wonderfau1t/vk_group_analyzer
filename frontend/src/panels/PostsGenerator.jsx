@@ -14,7 +14,6 @@ import {
   Image,
   Div,
   CustomSelect,
-  CustomSelectOption,
   ModalRoot,
 } from '@vkontakte/vkui';
 
@@ -24,6 +23,7 @@ import {
   Icon56HistoryOutline,
   Icon20QuestionOutline,
   Icon20PicturePlusOutline,
+  Icon20Flash,
   Icon12Cancel,
   Icon28CheckCircleOutline,
   Icon24Download
@@ -31,8 +31,10 @@ import {
 
 import SubscribeModal from "../modals/SubscribeModal";
 import useGenerationStore from '../stores/useGenerationStore';
+import { downloadGeneratedImage } from "../utils/downloadImage";
 
 import { useState, useEffect, useRef } from 'react';
+import PropTypes from "prop-types";
 
 const PostsGenerator = ({ contentType }) => {
   const [prompt, setPrompt] = useState("");
@@ -66,7 +68,10 @@ const PostsGenerator = ({ contentType }) => {
     message,
     savedPrompt,
     taskStatus,
+    generationCosts,
   } = useGenerationStore();
+
+  const generationCost = generationCosts[contentType];
 
   useEffect(() => {
     if (message && message.includes("Недостаточно токенов")) {
@@ -89,43 +94,19 @@ const PostsGenerator = ({ contentType }) => {
   }, [contentType]);
 
   const downloadImage = async (imageUrl) => {
-    // 1. VK Bridge (мобилка)
-    try {
-      await bridge.send("VKWebAppDownloadFile", {
-        url: imageUrl,
-        filename: `generated_${Date.now()}.png` 
-      });
-      return;
-    } catch {}
+    const result = await downloadGeneratedImage(imageUrl);
 
-    // 2. ПК через fetch
-    try {
-      const response = await fetch(imageUrl);
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки');
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `generated_${Date.now()}.png`;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      URL.revokeObjectURL(url);
-
-      return;
-
-    } catch (error) {
-      console.warn('fetch не сработал:', error);
+    if (!result.ok && result.message) {
+      setSnackbar(
+        <Snackbar
+          onClose={() => setSnackbar(null)}
+          before={<Icon28CheckCircleOutline fill="var(--vkui--color_icon_negative)" />}
+        >
+          {result.message}
+        </Snackbar>
+      );
+      setTimeout(() => setSnackbar(null), 3000);
     }
-
-    window.open(imageUrl, '_blank');
   };
 
   const handleCopy = (text) => {
@@ -243,12 +224,12 @@ const PostsGenerator = ({ contentType }) => {
                   onChange={onFileChange}
                 />
                 <Button 
-                  id="tooltip-1"
-                  mode="secondary"
+                  id="add-photo-button"
+                  size="m"
+                  mode="outline"
+                  appearance="accent-invariable"
                   before={<Icon20PicturePlusOutline />}
-                  style={{ color: "var(--vkui--color_icon_secondary)" }}
-                  rounded
-                  aria-label="Добавить файл"
+                  aria-label="Добавить фото"
                   onClick={handleButtonClick}
                   disabled={isPolling || isChecking}
                 >
@@ -271,7 +252,6 @@ const PostsGenerator = ({ contentType }) => {
                   background: 'var(--vkui--color_background_accent)', // Синий фон
                   color: 'white',
                   borderRadius: '50%',
-                  padding: 0,
                   height: "fit-content",
                   padding: 4,
                   margin: "2px 2px 0 0"
@@ -312,7 +292,14 @@ const PostsGenerator = ({ contentType }) => {
             disabled={!prompt.trim() || isPolling || isChecking}
             onClick={() => handleGenerate()}
           >
-            Сгенерировать
+            {generationCost === null || generationCost === undefined ? (
+              "Создать"
+            ) : (
+              <Flex align="center" justify="center" style={{ gap: 4 }}>
+                <span>Создать · {generationCost}</span>
+                <Icon20Flash width={18} height={18} />
+              </Flex>
+            )}
           </Button>
           <Button
             size="m"
@@ -403,6 +390,10 @@ const PostsGenerator = ({ contentType }) => {
       {snackbar}
     </>
   );
+};
+
+PostsGenerator.propTypes = {
+  contentType: PropTypes.oneOf(["post", "image"]).isRequired,
 };
 
 export default PostsGenerator;

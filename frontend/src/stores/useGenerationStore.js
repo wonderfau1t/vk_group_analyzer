@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { generationService } from '../services/generationService';
+import { DEFAULT_GENERATION_COSTS, normalizeGenerationCosts } from '../utils/generationCosts';
 
 const useGenerationStore = create(
   devtools(
@@ -8,6 +9,9 @@ const useGenerationStore = create(
       balance: 0,
       isDonut: false,
       isBalanceLoading: false,
+      generationCosts: DEFAULT_GENERATION_COSTS,
+      isCostsLoading: false,
+      costsError: null,
 
       activeTask: null, // { id: string, status: string }
       taskResult: null,
@@ -39,6 +43,24 @@ const useGenerationStore = create(
         } catch (error) {
           console.error("Ошибка при получении баланса:", error);
           set({ isBalanceLoading: false });
+        }
+      },
+
+      fetchCosts: async () => {
+        set({ isCostsLoading: true, costsError: null });
+        try {
+          const data = await generationService.getCosts();
+
+          set({
+            generationCosts: normalizeGenerationCosts(data),
+            isCostsLoading: false,
+          });
+        } catch (error) {
+          console.error("Ошибка при получении стоимости генерации:", error);
+          set({
+            isCostsLoading: false,
+            costsError: error.response?.data?.message || error.message,
+          });
         }
       },
 

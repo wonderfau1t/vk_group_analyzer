@@ -13,55 +13,31 @@ import {
 } from "@vkontakte/vkui";
 
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 import { Icon24DownloadOutline, Icon24Copy, Icon28CheckCircleOutline } from "@vkontakte/icons";
 
-import bridge from "@vkontakte/vk-bridge";
+import { downloadGeneratedImage } from "../utils/downloadImage";
 
 const GeneratedContentCard = ({ card, type }) => {
 
   const [snackbar, setSnackbar] = useState(null);
 
   const downloadImage = async (imageUrl) => {
-    // 1. VK Bridge (мобилка)
-    try {
-      await bridge.send("VKWebAppDownloadFile", {
-        url: imageUrl,
-        filename: `generated_${Date.now()}.png`
-      });
-      return;
-    } catch {}
+    const result = await downloadGeneratedImage(imageUrl);
 
-    // 2. ПК через fetch
-    try {
-      const response = await fetch(imageUrl);
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки');
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `generated_${Date.now()}.png`;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      URL.revokeObjectURL(url);
-
-      // 🔴 ВАЖНО: если дошли сюда — всё ок → выходим
-      return;
-
-    } catch (error) {
-      console.warn('fetch не сработал:', error);
+    if (!result.ok && result.message) {
+      setSnackbar(
+        <Snackbar
+          style={{ marginBottom: 80 }}
+          onClose={() => setSnackbar(null)}
+          before={<Icon28CheckCircleOutline fill="var(--vkui--color_icon_negative)" />}
+        >
+          {result.message}
+        </Snackbar>
+      );
+      setTimeout(() => setSnackbar(null), 3000);
     }
-
-    // 3. fallback ТОЛЬКО если всё реально упало
-    window.open(imageUrl, '_blank');
   };
 
   const handleCopy = async (text) => {
@@ -195,6 +171,16 @@ const GeneratedContentCard = ({ card, type }) => {
       {snackbar}
     </>
   );
+};
+
+GeneratedContentCard.propTypes = {
+  card: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    createdAt: PropTypes.string,
+    prompt: PropTypes.string.isRequired,
+    result: PropTypes.string.isRequired,
+  }).isRequired,
+  type: PropTypes.oneOf(["posts", "images"]).isRequired,
 };
 
 export default GeneratedContentCard;

@@ -5,8 +5,22 @@ import {
   Icon20BookSpreadOutline,
   Icon20MessageRectangleOutline
 } from "@vkontakte/icons";
+import PropTypes from "prop-types";
+
+import { openExternalLink } from "../utils/openExternalLink";
+
+const SUBSCRIBE_GROUP_URL = "https://vk.com/club228359093?w=donut_payment-228359093&levelId=2855";
 
 const SubscribeModal = ({ id, onClose, onSubscribe }) => {
+  const handleSubscribe = () => {
+    if (onSubscribe) {
+      onSubscribe();
+    }
+
+    onClose();
+    openExternalLink(SUBSCRIBE_GROUP_URL);
+  };
+
     const benefits = [
     {
       icon: <Icon20Flash />,
@@ -80,10 +94,7 @@ const SubscribeModal = ({ id, onClose, onSubscribe }) => {
             <Button 
               size="l" 
               stretched 
-              onClick={() => {
-                if (onSubscribe) onSubscribe();
-                onClose();
-              }}
+              onClick={handleSubscribe}
               style={{ marginBottom: 12 }}
             >
               🔥 Подключить за 590 ₽ 🔥
@@ -100,6 +111,12 @@ const SubscribeModal = ({ id, onClose, onSubscribe }) => {
       </div>
     </ModalPage>
   );
+};
+
+SubscribeModal.propTypes = {
+  id: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubscribe: PropTypes.func,
 };
 
 export default SubscribeModal;
