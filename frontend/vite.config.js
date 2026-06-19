@@ -62,7 +62,7 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: [
       'localhost',
-      'tunnel.wonderrfau1t.site',
+      // 'tunnel.wonderrfau1t.site',
       '.wonderrfau1t.site'
     ],
     hmr: {
