@@ -143,7 +143,7 @@ const AnalysedGroup = ({id, onBackClick, groupId, fetchedToken}) => {
       try {
         const launchParams = await bridge.send('VKWebAppGetLaunchParams');
 
-        const response = await fetch(`https://https://api.lesyatarget.ru/${groupId}`, {
+        const response = await fetch(`https://https://api.lesyatarget.ru/api/v1/${groupId}`, {
           method: 'GET',
           headers: {
             "Content-Type": "application/json",

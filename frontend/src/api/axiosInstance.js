@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://api.lesyatarget.ru',
+  baseURL: 'https://api.lesyatarget.ru/api/v1',
   timeout: 10000,
 });
 

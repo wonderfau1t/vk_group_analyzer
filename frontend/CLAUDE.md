@@ -46,7 +46,7 @@ Call `checkAndStartPolling()` on app mount to resume polling if a task is alread
 
 ### API Layer
 
-`src/api/axiosInstance.js` — Axios client, base URL `https://https://api.lesyatarget.ru`, 10s timeout.
+`src/api/axiosInstance.js` — Axios client, base URL `https://https://api.lesyatarget.ru/api/v1`, 10s timeout.
 
 `src/services/generationService.js` — all backend calls. Every request includes `X-VK-Launch-Params` header (obtained via `bridge.send('VKWebAppGetLaunchParams')`).
 
