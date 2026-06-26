@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 
 import { openExternalLink } from "../utils/openExternalLink";
 
-const SUBSCRIBE_GROUP_URL = "https://vk.com/club228359093?w=donut_payment-228359093&levelId=2855";
+const SUBSCRIBE_GROUP_URL = "https://vk.com/lesya_ostashova.targetolog?w=donut_payment-48544404&levelId=3518";
 
 const SubscribeModal = ({ id, onClose, onSubscribe }) => {
   const handleSubscribe = () => {
