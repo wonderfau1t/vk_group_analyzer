@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://vk.wonderrfau1t.site/api/v1',
+  baseURL: 'https://api.lesyatarget.ru',
   timeout: 10000,
 });
 

@@ -97,7 +97,7 @@ const SubscribeModal = ({ id, onClose, onSubscribe }) => {
               onClick={handleSubscribe}
               style={{ marginBottom: 12 }}
             >
-              🔥 Подключить за 590 ₽ 🔥
+              🔥 Подключить за 890 ₽ 🔥
             </Button>
             
             <Button 
