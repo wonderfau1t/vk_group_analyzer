@@ -67,7 +67,7 @@ const SubscribeModal = ({ id, onClose, onSubscribe }) => {
             </div>
 
             <Text style={{ fontWeight: 600, marginBottom: 12 }}>
-              Подключите VK Donut за 590 ₽/мес и получите:
+              Подключите VK Donut за 890 ₽/мес и получите:
             </Text>
 
             <Group style={{ marginBottom: 24 }}>
